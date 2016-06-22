@@ -10,13 +10,13 @@
 		next_position/3
 		]).
 
--define(L,  0.01). % leg's length
+-define(L,  0.007). % leg's length
 -define(M1, 0.20). % the mass of the body
 -define(M2, 0.05). % the mass of the leg
 -define(Foot,0.05).
 -define(Eta, math:atan(?L/?Foot)).
 -define(Rh, math:sqrt(?L*?L + ?Foot*?Foot)).
--define(Eta0, 0.5).
+-define(Eta0, 0.6).
 -define(R0, 0.04). % distance from tip of foot to the leg's CoM
 
 %% springs params
@@ -33,40 +33,35 @@
 -define(D, 0.03). % The distance between body CoM and hip
 -define(G, 9.81).
 
--define(TOLERANCE, 0.01). % the tolerance of computing angle derivative
 
-
-init() -> init(1.0, 0.6).
+init() -> init(1.6, 0.1).
 
 init(Alpha, Beta) -> {Alpha, 0.0, Beta, 0.0, 0.0}.
 
 
 next_position({A,A_der,B,B_der,Psi},New_Psi,Tau) ->
 	% consider estimating energy injection or consumption
-	case estimate(A,A_der,B,B_der,Psi,Tau,10) of
-		{A1,B1} -> {A1,(A1-A)/Tau,B1,(B1-B)/Tau,New_Psi};
-		_ -> io:format("ERROR: differential equations of motion diverged~n")
-	end.
-
-
-estimate(_,_,_,_,_,_,0) -> deverged;
-estimate(A,A_der,B,B_der,Psi,Tau,N) -> 
 	E11 = ?I1, E12 = i11(A),
 	E21 = i21(A), E22 = i22(A),
 
 	C1 = (f1(A,B,Psi) - i12(A)*B_der*B_der)*Tau*Tau +
 		?I1*(A+A_der*Tau) + E12*(B+B_der*Tau),
 	C2 = (f2(A,B) - i23(A)*A_der*A_der - i24(A)*A_der*B_der)*Tau*Tau + 
-		E21*(A+A_der*Tau) + E22(A)*(B+B_der*Tau),
-
+		E21*(A+A_der*Tau) + E22*(B+B_der*Tau),
+	%io:format("I1=~p~n",[?I1]),
+	%io:format("I11=~p~n",[E12]),
+	%io:format("I21=~p~n",[E21]),
+	%io:format("I12=~p~n",[i12(A)]),
+	%io:format("I22=~p~n",[E22]),
+	%io:format("I23=~p~n",[i23(A)]),
+	%io:format("I24=~p~n",[i24(A)]),
+	%io:format("f1=~p~n",[f1(A,B,Psi)]),
+	%io:format("f2=~p~n",[f2(A,B)]),
+	
 	Det = E11*E22 - E12*E21,
 	A1 = (C1*E22 - C2*E12)/Det,
 	B1 = (C2*E11 - C1*E21)/Det,
-	Da = (A1-A)/Tau, Db = (B1-B)/Tau,
-	case abs(Da - A_der) < ?TOLERANCE andalso abs(Db - B_der) < ?TOLERANCE of
-		true -> {A1,B1};
-		false-> estimate(A,Da,B,Db,Psi,Tau,N-1)
-	end.
+	{A1, (A1-A)/Tau, B1, (B1-B)/Tau, New_Psi}.
 
 %
 % I1*A'' + i11*B'' + i12*B'^2 = f1(A,B,Psi)
