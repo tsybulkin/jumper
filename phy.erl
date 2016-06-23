@@ -7,10 +7,11 @@
 
 -module(phy).
 -export([init/0, init/2,
-		next_position/3
+		next_position/3,
+		get_XYa/3, get_XYh/3, get_XY0/4, get_XY1/3
 		]).
 
--define(L,  0.007). % leg's length
+-define(L,  0.1). % leg's length
 -define(M1, 0.20). % the mass of the body
 -define(M2, 0.05). % the mass of the leg
 -define(Foot,0.05).
@@ -90,3 +91,12 @@ psi1(Psi) -> ?Dz + ?Z0*math:sin(Psi).
 
 psi2(Psi) -> ?Dz - ?Z0*math:sin(Psi).
 
+
+get_XYa(Xt,Yt,B) -> {Xt+?Foot*math:cos(B), Yt+?Foot*math:sin(B)}.
+
+get_XYh(Xt,Yt,B) -> {Xt+?Rh*math:cos(?Eta+B), Yt+?Rh*math:sin(?Eta+B)}.
+
+get_XY0(Xt,Yt,A,B)->{Xt+?Rh*math:cos(?Eta+B)-?D*math:sin(A+B), 
+					 Yt+?Rh*math:sin(?Eta+B)+?D*math:cos(A+B)}.
+
+get_XY1(Xt,Yt,B) -> {Xt+?R0*math:cos(?Eta0+B), Yt+?R0*math:sin(?Eta0+B)}.
