@@ -17,7 +17,7 @@
 -define(Foot,0.05).
 -define(Eta, math:atan(?L/?Foot)).
 -define(Rh, math:sqrt(?L*?L + ?Foot*?Foot)).
--define(Eta0, 0.6).
+-define(Eta0, 0.5).
 -define(R0, 0.04). % distance from tip of foot to the leg's CoM
 
 %% springs params
@@ -26,7 +26,7 @@
 -define(Z2, 0.025).
 -define(K1, 200.0).
 -define(K2, 200.0).
--define(Dz, 0.02). % initial strech of the springs
+-define(Dz, 0.03). % initial strech of the springs
 
 -define(I1, 1.00e-3). % Inertial moment of the body arounf CoM
 -define(I2, 1.25e-4). % Inertial moment of the leg around tip of foot
@@ -35,20 +35,20 @@
 -define(G, 9.81).
 
 
-init() -> init(1.6, 0.1).
+init() -> init(0.8, 0.25).
 
 init(Alpha, Beta) -> {Alpha, 0.0, Beta, 0.0, 0.0}.
 
 
 next_position({A,A_der,B,B_der,Psi},New_Psi,Tau) ->
 	% consider estimating energy injection or consumption
-	E11 = ?I1, E12 = i11(A),
-	E21 = i21(A), E22 = i22(A),
+	E11 = i11(A,B), E12 = i13(A,B),
+	E21 = i21(A), E22 = i23(A),
 
-	C1 = (f1(A,B,Psi) - i12(A)*B_der*B_der)*Tau*Tau +
-		?I1*(A+A_der*Tau) + E12*(B+B_der*Tau),
-	C2 = (f2(A,B) - i23(A)*A_der*A_der - i24(A)*A_der*B_der)*Tau*Tau + 
-		E21*(A+A_der*Tau) + E22*(B+B_der*Tau),
+	C1 = (f1(A,B,Psi)-i12(A,B)*A_der*A_der-i14(A,B)*B_der*B_der-i15(A,B)*A_der*B_der)*Tau*Tau
+		+ i11(A,B)*(A+A_der*Tau) + i13(A,B)*(B+B_der*Tau),
+	C2 = (f2(A,B) - i22(A,B)*A_der*A_der - i24(A,B)*B_der*B_der)*Tau*Tau 
+		+ i21(A)*(A+A_der*Tau) + i23(A)*(B+B_der*Tau),
 	%io:format("I1=~p~n",[?I1]),
 	%io:format("I11=~p~n",[E12]),
 	%io:format("I21=~p~n",[E21]),
@@ -65,32 +65,30 @@ next_position({A,A_der,B,B_der,Psi},New_Psi,Tau) ->
 	{A1, (A1-A)/Tau, B1, (B1-B)/Tau, New_Psi}.
 
 %
-% I1*A'' + i11*B'' + i12*B'^2 = f1(A,B,Psi)
+% I11*A'' + i12*A'^2 + i13*B'' + i14*B'^2 + i15*A'*B' = f1(A,B,Psi)
 %
-% I21*A'' + i22*B'' + i23*A'^2 + i24*A'*B' = f2(A,B,Psi)
+% I21*A'' + i22*A'^2 +i23*B'' + i24*B'^2  = f2(A,B)
 %
-i11(A) -> ?I1 - ?M1*?Rh*?D*math:sin(A).
-i12(A) -> ?M1*?Rh*?D*math:cos(A).
-
-i21(A) -> ?I1 + ?M1*?D*?D + ?M1*?Rh*?D*math:sin(A).
-i22(A) -> ?I1 + ?I2 + ?M1*(?Rh*?Rh+?D*?D) + 2*?M1*?Rh*?D*math:sin(A).
-i23(A) -> ?M1*?Rh*?D*math:cos(A).
-i24(A) -> 2*?M1*?Rh*?D*math:cos(A). 
+i11(_A,_B) -> ?I1 - ?K0 + ?M1*?D*?D.
+i12(_A,_B) -> 0.
+i13(A,_B) -> ?I1 + ?M1*?Rh*?D*math:sin(?Eta-A) + ?M1*?D*?D.
+i14(A,_B) -> ?M1*?D*?Rh*math:cos(A-?Eta).
+i15(_A,_B) -> 0.
 
 
-f1(A,B,Psi) ->  (?K1*?Z1*?Z1 + ?K2*?Z2*?Z2)*math:sin(A)*math:cos(A) +
-				(?K2*psi2(Psi)*?Z2 - ?K1*psi1(Psi)*?Z1)*math:sin(A) +
-				?M1*?G*?D*math:sin(?Eta+A+B).
-
-f2(A,B) ->	?M1*?G*?Rh*math:cos(?Eta+B) +
-			?M1*?G*?D*math:sin(?Eta+A+B) -
-			?M2*?G*?R0*math:cos(?Eta0+B).
+i21(A) -> ?I1 + ?M1*(?Rh*?D*math:sin(?Eta-A) + ?D*?D).
+i22(A,B) -> 2*?M1*?D*?D*math:sin(A+B)*math:cos(A+B)-?M1*?Rh*?D*math:cos(?Eta-A).
+i23(A) -> ?I1 +?I2 + ?M1*(?Rh*?Rh + 2*?Rh*?D*math:sin(?Eta-A) + ?D*?D).
+i24(A,B) -> 2*?M1*?D*?D*math:sin(A+B)*math:cos(A+B) - 2*?Rh*?D*math:cos(?Eta-A). 
 
 
-psi1(Psi) -> ?Dz + ?Z0*math:sin(Psi).
+f1(A,B,Psi) ->  ?M1*?G*?D*math:sin(A+B)
+				- ?K1*?Z1*(?Dz + ?Z0*math:sin(Psi) - ?Z1*math:cos(A))*math:sin(A)
+				+ ?K2*?Z2*(?Dz - ?Z0*math:sin(Psi) + ?Z2*math:cos(A))*math:sin(A).
 
-psi2(Psi) -> ?Dz - ?Z0*math:sin(Psi).
-
+f2(A,B) ->	- ?M2*?G*?R0*math:cos(?Eta0+B)
+			- ?M1*?G*(?Rh*math:cos(?Eta+B) - ?D*math:sin(A+B)).
+			
 
 get_XYa(Xt,Yt,B) -> {Xt+?Foot*math:cos(B), Yt+?Foot*math:sin(B)}.
 
