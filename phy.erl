@@ -17,7 +17,7 @@
 -define(Foot,0.05).
 -define(Eta, math:atan(?L/?Foot)).
 -define(Rh, math:sqrt(?L*?L + ?Foot*?Foot)).
--define(Eta0, 0.5).
+-define(Eta0, 0.45).
 -define(R0, 0.04). % distance from tip of foot to the leg's CoM
 
 %% springs params
@@ -29,13 +29,13 @@
 -define(Dz, 0.03). % initial strech of the springs
 
 -define(I1, 1.00e-3). % Inertial moment of the body arounf CoM
--define(I2, 1.25e-4). % Inertial moment of the leg around tip of foot
+-define(I2, 1.25e4). % Inertial moment of the leg around tip of foot
 -define(K0, 0.01). % The coefficient of friction between the body and the leg
 -define(D, 0.03). % The distance between body CoM and hip
 -define(G, 9.81).
 
 
-init() -> init(0.8, 0.25).
+init() -> init(1.4, 0.27).
 
 init(Alpha, Beta) -> {Alpha, 0.0, Beta, 0.0, 0.0}.
 
@@ -47,7 +47,7 @@ next_position({A,A_der,B,B_der,Psi},New_Psi,Tau) ->
 
 	C1 = (f1(A,B,Psi)-i12(A,B)*A_der*A_der-i14(A,B)*B_der*B_der-i15(A,B)*A_der*B_der)*Tau*Tau
 		+ i11(A,B)*(A+A_der*Tau) + i13(A,B)*(B+B_der*Tau),
-	C2 = (f2(A,B) - i22(A,B)*A_der*A_der - i24(A,B)*B_der*B_der)*Tau*Tau 
+	C2 = (f2(A,B) - i22(A,B)*A_der*A_der - i24(A,B)*B_der*B_der - i25(A)*A_der*B_der)*Tau*Tau 
 		+ i21(A)*(A+A_der*Tau) + i23(A)*(B+B_der*Tau),
 	%io:format("I1=~p~n",[?I1]),
 	%io:format("I11=~p~n",[E12]),
@@ -67,7 +67,7 @@ next_position({A,A_der,B,B_der,Psi},New_Psi,Tau) ->
 %
 % I11*A'' + i12*A'^2 + i13*B'' + i14*B'^2 + i15*A'*B' = f1(A,B,Psi)
 %
-% I21*A'' + i22*A'^2 +i23*B'' + i24*B'^2  = f2(A,B)
+% I21*A'' + i22*A'^2 +i23*B'' + i24*B'^2  + i25*A'B' = f2(A,B)
 %
 i11(_A,_B) -> ?I1 - ?K0 + ?M1*?D*?D.
 i12(_A,_B) -> 0.
@@ -79,12 +79,13 @@ i15(_A,_B) -> 0.
 i21(A) -> ?I1 + ?M1*(?Rh*?D*math:sin(?Eta-A) + ?D*?D).
 i22(A,B) -> 2*?M1*?D*?D*math:sin(A+B)*math:cos(A+B)-?M1*?Rh*?D*math:cos(?Eta-A).
 i23(A) -> ?I1 +?I2 + ?M1*(?Rh*?Rh + 2*?Rh*?D*math:sin(?Eta-A) + ?D*?D).
-i24(A,B) -> 2*?M1*?D*?D*math:sin(A+B)*math:cos(A+B) - 2*?Rh*?D*math:cos(?Eta-A). 
+i24(A,B) -> 2*?M1*?D*?D*math:sin(A+B)*math:cos(A+B). 
+i25(A) -> -2*?M1*?Rh*?D*math:cos(?Eta-A).
 
 
 f1(A,B,Psi) ->  ?M1*?G*?D*math:sin(A+B)
-				- ?K1*?Z1*(?Dz + ?Z0*math:sin(Psi) - ?Z1*math:cos(A))*math:sin(A)
-				+ ?K2*?Z2*(?Dz - ?Z0*math:sin(Psi) + ?Z2*math:cos(A))*math:sin(A).
+				- ?K1*?Z1*(?Dz + ?Z0*math:sin(Psi) - ?Z1*math:cos(A) )*math:sin(A)
+				+ ?K2*?Z2*(?Dz - ?Z0*math:sin(Psi) + ?Z2*math:cos(A) )*math:sin(A).
 
 f2(A,B) ->	- ?M2*?G*?R0*math:cos(?Eta0+B)
 			- ?M1*?G*(?Rh*math:cos(?Eta+B) - ?D*math:sin(A+B)).
