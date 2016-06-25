@@ -22,8 +22,8 @@
 
 %% springs params
 -define(Z0, 0.025).
--define(Z1, 0.025).
--define(Z2, 0.025).
+-define(Z1, 0.01).
+-define(Z2, 0.01).
 -define(K1, 200.0).
 -define(K2, 200.0).
 -define(Dz, 0.03). % initial strech of the springs
@@ -35,7 +35,7 @@
 -define(G, 9.81).
 
 
-init() -> init(1.4, 0.27).
+init() -> init(1.1, 0.27).
 
 init(Alpha, Beta) -> {Alpha, 0.0, Beta, 0.0, 0.0}.
 

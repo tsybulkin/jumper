@@ -6,7 +6,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -module(sim).
--export([run/2
+-export([run/2, run1/2
 		]).
 
 
@@ -19,3 +19,13 @@ run(Pos,Tau,T,Log) ->
 	Pos1 = phy:next_position(Pos,0,Tau),
 	io:format("~p~n",[Pos1]),
 	run(Pos1,Tau,T-Tau,[Pos1|Log]).
+
+
+run1(Tau,T) -> 
+	run1(phy1:init(),Tau,T,[]).
+
+run1(_,Tau,T,Log) when T<0 -> show1:make_demo(lists:reverse(Log),Tau);
+run1(Pos,Tau,T,Log) -> 
+	Pos1 = phy1:next_position(Pos,0,Tau),
+	io:format("~p~n",[Pos1]),
+	run1(Pos1,Tau,T-Tau,[Pos1|Log]).
