@@ -12,13 +12,13 @@
 
 -define(L,  0.1). % leg's length
 -define(M, 0.10). % the mass of the body
--define(K0, 0.02). % friction in the shoulder
+-define(K0, 0.01). % friction in the shoulder
 
 %% springs params
--define(Z0, 0.025).
--define(Z1, 0.03).
--define(Z2, 0.03).
--define(K1, 200.0).
+-define(Z0, 0.03).
+-define(Z1, 0.025).
+-define(Z2, 0.025).
+-define(K1, 300.0).
 -define(K2, 200.0).
 -define(Dz, 0.03). % initial strech of the springs
 

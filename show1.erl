@@ -22,7 +22,7 @@ make_demo([{A,_,_}|Log],Tau) ->
     				style='fill:grey;stroke:brown;'/>~n~n",[Xt1,Yt1-200]),
 	{Xm,Ym} = phy1:get_XYm(?Xt,?Yt,A), {Xm1,Ym1} = px({Xm,Ym}),
 	io:format(Out, "\t<line x1='~w' y1='~w' x2='~w' y2='~w'
-		style='stroke:red;stroke-width:3' >~n",[Xm1,Ym1,Xt1,Yt1]),
+		style='stroke:blue;stroke-width:3' >~n",[Xm1,Ym1,Xt1,Yt1]),
 
 	make_demo(Log,Xt1,Yt1,0,Tau,Out).
 

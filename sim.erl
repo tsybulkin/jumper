@@ -26,6 +26,6 @@ run1(Tau,T) ->
 
 run1(_,Tau,T,Log) when T<0 -> show1:make_demo(lists:reverse(Log),Tau);
 run1(Pos,Tau,T,Log) -> 
-	Pos1 = phy1:next_position(Pos,0,Tau),
+	Pos1 = phy1:next_position(Pos,0.5,Tau),
 	io:format("~p~n",[Pos1]),
 	run1(Pos1,Tau,T-Tau,[Pos1|Log]).
