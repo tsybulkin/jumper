@@ -12,6 +12,7 @@
 
 -define(L,  0.1). % leg's length
 -define(M, 0.10). % the mass of the body
+-define(K0, 0.4). % friction in the shoulder
 
 %% springs params
 -define(Z0, 0.025).
@@ -31,7 +32,7 @@ init(Alpha) -> {Alpha, Alpha, 0.0}.
 
 next_position({A,A_old,Psi},New_Psi,Tau) ->
 	% consider estimating energy injection or consumption
-	A_new = 2*A - A_old + f1(A,Psi)*Tau*Tau,
+	A_new = 2*A - A_old + f1(A,Psi)*Tau*Tau - ?K0*(A-A_old)*Tau,
 	{A_new, A, New_Psi}.
 
 %
