@@ -6,52 +6,50 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -module(learn).
--export([get_state/2, get_policy/2,get_state_value/2,
-		is_terminal_state/1,
-		get_reward/3,
+-export([get_state/1, get_policy/3,get_state_value/2,
+		%is_terminal_state/1,
+		get_reward/5,
 		learn/5,
 		get_psi/1
 		]).
 
--define(EPS,   0.1).
--define(ALPHA, 0.8).
+-define(ALPHA, 0.2).
 -define(GAMA,  0.95).
 
 
 
-get_state(Ae,{A,A_der,_Psi}) -> {round(5*(Ae - A)), round(5*A_der)}. 
+get_state({A,A_der,_Psi}) -> {round(10*A), round(5*A_der)}. 
 
 
-get_reward(_State,_Action,{A,A1}) ->
-	case is_terminal_state({A,A1}) of
-		true -> 20/(abs(A)+1) - abs(A1);
-		false ->
-			if
-				A < -15 -> -10;
-				A > 15  -> -10;
-				A == 0 andalso A1 == 0 -> 100;
-				true -> -1 + 10/(abs(A)+1)
-			end
+get_reward(Ae,PrevAction,{_A1,_Ad1},Action,{A2,_Ad2}) ->
+	if
+		A2 < -15 -> -10;
+		A2 > 15  -> -10;
+		true -> -1 + 1/(abs(Ae-A2)+0.01) - abs(PrevAction-Action)/3
 	end.
 
 
-is_terminal_state({0,0}) -> true;
-is_terminal_state(_) -> false.
+%is_terminal_state({0,0}) -> true;
+%is_terminal_state(_) -> false.
 
 
 
 learn(State, NextState, Action, Reward, Q) -> 
-	case dict:find(State,Q) of
-		{ok, Values} -> case lists:keyfind(Action,2,Values) of
-							{V,Action} -> V;
-							false -> V = 0
-						end;
-		error ->
-			Values = [{0,Action}], V = 0
-	end,
 	V1 = get_state_value(NextState,Q),
-	V_new = V + ?ALPHA * (Reward + ?GAMA * V1 - V),
-	Values1 = lists:keyreplace(Action,2,Values,{V_new,Action}),
+	case dict:find(State,Q) of
+		{ok, Values} -> 
+			%io:format("Values: ~p\t",[Values]),
+			case lists:keyfind(Action,2,Values) of
+				{V,Action} -> 
+					V_new = (1-?ALPHA)*V + ?ALPHA * (Reward + ?GAMA * V1),
+					Values1 = lists:keyreplace(Action,2,Values,{V_new,Action});
+				false -> 
+					Values1 = [{V1,Action}|Values]
+			end;
+		error ->
+			Values1 = [{V1,Action}]
+	end,
+	%io:format("New values for ~p: ~p~n",[State,Values1]),
 	dict:store(State,Values1,Q).
 
 
@@ -67,19 +65,26 @@ get_best_learned_action(State,Q) ->
 	case dict:find(State,Q) of
 		{ok, Values} -> 
 			{V,A} = lists:max(Values), 
-			if V>0 -> A; length(Values)>100 -> A; true -> get_random_action() end;
+			if V>0 -> A; length(Values)>5 -> A; true -> get_random_action([Ac || {_,Ac}<-Values]) end;
 		error -> get_random_action()
 	end.
 
 
-get_policy(State,Q) ->
-	case flip_coin(0.1) of
+get_policy(State,Q,Eps) ->
+	case flip_coin(Eps) of
 		true -> get_random_action();
 		false-> get_best_learned_action(State,Q)
 	end.
 
 
 get_random_action() -> random:uniform(15)-5. 
+
+get_random_action(Ls) ->
+	A = random:uniform(15)-5,
+	case lists:member(A,Ls) of
+		true -> get_random_action(Ls);
+		false -> A
+	end.
 
 
 get_psi(Action) -> Action/10.
