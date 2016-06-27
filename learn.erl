@@ -19,18 +19,18 @@
 
 
 
-get_state(Ae,{A,A_der,_Psi}) -> {round(10*(Ae - A)), round(10*A_der)}. 
+get_state(Ae,{A,A_der,_Psi}) -> {round(5*(Ae - A)), round(5*A_der)}. 
 
 
 get_reward(_State,_Action,{A,A1}) ->
 	case is_terminal_state({A,A1}) of
-		true -> 10/(abs(A)+1) - abs(A1);
+		true -> 20/(abs(A)+1) - abs(A1);
 		false ->
 			if
-				A < -30 -> -10;
-				A > 30  -> -10;
+				A < -15 -> -10;
+				A > 15  -> -10;
 				A == 0 andalso A1 == 0 -> 100;
-				true -> -abs(A)/10 - abs(A1)/20
+				true -> -1 + 10/(abs(A)+1)
 			end
 	end.
 
