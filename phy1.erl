@@ -23,6 +23,7 @@
 -define(Dz, 0.03). % initial strech of the springs
 
 -define(G, 9.81).
+-define(TAU, 0.01).
 
 
 init() -> init(1.5).
@@ -30,10 +31,11 @@ init() -> init(1.5).
 init(Alpha) -> {Alpha, 0.0, 0.0}.
 
 
-next_position({A,A_der,Psi},New_Psi,Tau) ->
+next_position(Pos,_,Period) when Period =< 0 -> Pos;
+next_position({A,A_der,Psi},New_Psi,Period) ->
 	% consider estimating energy injection or consumption
-	A_new = A + A_der*Tau + (f1(A,Psi) - ?K0*A_der)*Tau*Tau/?M/?L/?L,
-	{A_new, (A_new-A)/Tau, New_Psi}.
+	A_new = A + A_der*?TAU + (f1(A,Psi) - ?K0*A_der)*?TAU*?TAU/?M/?L/?L,
+	next_position({A_new, (A_new-A)/?TAU, New_Psi},New_Psi,Period-?TAU).
 
 %
 %

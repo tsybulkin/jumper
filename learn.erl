@@ -13,7 +13,7 @@
 		get_psi/1
 		]).
 
--define(ALPHA, 0.2).
+-define(ALPHA, 0.5).
 -define(GAMA,  0.95).
 
 
@@ -23,14 +23,10 @@ get_state({A,A_der,_Psi}) -> {round(10*A), round(5*A_der)}.
 
 get_reward(Ae,PrevAction,{_A1,_Ad1},Action,{A2,_Ad2}) ->
 	if
-		A2 < -15 -> -10;
-		A2 > 15  -> -10;
-		true -> -1 + 1/(abs(Ae-A2)+0.01) - abs(PrevAction-Action)/3
+		A2 < 0 -> -50;
+		A2 > 30  -> -50;
+		true -> -1 + 10/(abs(Ae-A2)+0.1) - abs(PrevAction-Action)/50
 	end.
-
-
-%is_terminal_state({0,0}) -> true;
-%is_terminal_state(_) -> false.
 
 
 

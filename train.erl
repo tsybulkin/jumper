@@ -10,13 +10,13 @@
 		run_with_pid/0, run_with_pid/5
 		]).
 
--define(EPISODE_LEN, 1.0). 
--define(TAU, 0.01).
+-define(EPISODE_LEN, 0.5). 
+-define(TAU, 0.1).
 
 train(Ae,N) -> Q = dict:new(), train(Ae,N,Q,0.25).
 
 train(Ae,0,Q,_) ->
-	Pos = phy1:init(2.0),
+	Pos = phy1:init(1.5),
 	Log = run_demo(Ae,Pos,?TAU,?EPISODE_LEN,Q,[]), 
 	show1:make_demo(Log,?TAU),
 	Q;
@@ -25,7 +25,7 @@ train(Ae,N,Q,Eps) ->
 		0 -> io:format("Q size: ~p~n",[dict:size(Q)]);
 		_ -> ok
 	end,
-	Init_A = 3*(random:uniform()-0.5),
+	Init_A = 3*(0.1+random:uniform()),
 	Pos = phy1:init(Init_A),
 	Q1 = run_episode(Ae,Pos,?TAU,?EPISODE_LEN,Q,Eps),
 	train(Ae,N-1,Q1,Eps).
@@ -41,7 +41,7 @@ run_episode(Ae,Pos,Tau,T,Q,Eps) when T>0 ->
 	Q1 = learn:learn(State, NextState, Action, Rwd, Q),
 	run_episode(Ae,NextPos,Tau,T-Tau,Q1,Eps);
 	
-run_episode(_Ae,_Pos,_,_T,Q,_) -> Q.
+run_episode(_Ae,_,_,_T,Q,_) -> Q.
 
 
 run_with_pid() -> run_with_pid(0.7,{1.5,0.0,0.0},?TAU,1.0,[]).
