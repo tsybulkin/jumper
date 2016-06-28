@@ -37,7 +37,7 @@ run_episode(Ae,Pos,Tau,T,Q,Eps) when T>0 ->
 	Psi = learn:get_psi(Action),
 	NextPos = phy1:next_position(Pos,Psi,Tau),
 	NextState = learn:get_state(NextPos),
-	Rwd = learn:get_reward(Ae,PrevAction,State,Action,NextState),
+	Rwd = learn:get_reward(Ae,PrevAction,Pos,Action,NextPos),
 	Q1 = learn:learn(State, NextState, Action, Rwd, Q),
 	run_episode(Ae,NextPos,Tau,T-Tau,Q1,Eps);
 	
