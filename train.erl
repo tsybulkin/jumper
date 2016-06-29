@@ -6,14 +6,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -module(train).
--export([train/2, train/4, 
-		run_with_pid/0, run_with_pid/5
+-export([train/2, train/4, get_dataset/3
 		]).
 
 -define(EPISODE_LEN, 0.5). 
 -define(TAU, 0.1).
 
-train(Ae,N) -> Q = dict:new(), train(Ae,N,Q,0.25).
+
+get_dataset([],_,_) -> ok;
+get_dataset([Ae|Targets],N,File) ->
+	{ok,Out} = file:open(File, [append]),
+	Q = train(Ae,N),
+	lists:foreach(
+		fun({A,A_der}=State)->
+			Ac = learn:get_best_learned_action(State,Q),
+			Psi = learn:get_psi(Ac),
+			io:format(Out,"~p;~p;~p;~p~n",[Ae,A,A_der,Psi])
+		end, dict:fetch_keys(Q)),
+	file:close(Out),
+	get_dataset(Targets,N,File).
+
+
+train(Ae,N) -> Q = dict:new(), train(Ae,N,Q,0.2).
 
 train(Ae,0,Q,_) ->
 	Pos = phy1:init(1.5),
@@ -44,19 +58,6 @@ run_episode(Ae,Pos,Tau,T,Q,Eps) when T>0 ->
 run_episode(_Ae,_,_,_T,Q,_) -> Q.
 
 
-run_with_pid() -> run_with_pid(0.7,{1.5,0.0,0.0},?TAU,1.0,[]).
-	
-run_with_pid(Ae,Pos,Tau,T,Log) when T>0 ->
-	Cntrl = pid:get_control(Ae,Pos),
-	io:format("\tControl:~p",[Cntrl]),
-	Psi = pid:get_psi(Cntrl), io:format("\tPsi:~p~n",[Psi]),
-	NextPos = phy1:next_position(Pos,Psi,Tau),
-	io:format("\Pos:~p",[NextPos]),
-	run_with_pid(Ae,NextPos,Tau,T-Tau,[NextPos|Log]);
-run_with_pid(_,_,Tau,_,Log) -> 
-	io:format("~p~n",[lists:reverse(Log)]),
-	show1:make_demo(lists:reverse(Log), Tau).
-
 
 
 run_demo(Ae,Pos,Tau,T,Q,Log) when T>0 -> 
@@ -65,5 +66,5 @@ run_demo(Ae,Pos,Tau,T,Q,Log) when T>0 ->
 	io:format("~p\t~p~n",[State,Action]),
 	Psi = learn:get_psi(Action),
 	NextPos = phy1:next_position(Pos,Psi,Tau),
-	run_demo(Ae,NextPos,Tau,T-Tau,Q,[NextPos|Log]);
-run_demo(_,_,_,_,_,Log) -> lists:reverse(Log).
+	run_demo(Ae,NextPos,Tau,T-Tau,Q,[Pos|Log]);
+run_demo(_,Pos,_,_,_,Log) -> lists:reverse([Pos|Log]).

@@ -8,7 +8,7 @@
 -module(learn).
 -export([get_state/1, get_policy/3,get_state_value/2,
 		%is_terminal_state/1,
-		get_reward/5,
+		get_reward/5,get_best_learned_action/2,
 		learn/5,
 		get_psi/1
 		]).
@@ -73,10 +73,11 @@ get_policy(State,Q,Eps) ->
 	end.
 
 
-get_random_action() -> random:uniform(15)-5. 
+get_random_action() -> random:uniform(17)-7. 
 
+get_random_action(Ls) when length(Ls) >= 12 -> get_random_action();
 get_random_action(Ls) ->
-	A = random:uniform(15)-5,
+	A = get_random_action(),
 	case lists:member(A,Ls) of
 		true -> get_random_action(Ls);
 		false -> A
