@@ -60,7 +60,7 @@ class Network(object):
         is the learning rate."""
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
-        for x, y in mini_batch:
+        for x,y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
@@ -78,16 +78,21 @@ class Network(object):
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         # feedforward
         activation = x
+        #print 'x:',x
         activations = [x] # list to store all the activations, layer by layer
         zs = [] # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
+            #print 'b:',b
+            #print 'w:',w
             z = np.dot(w, activation)+b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
+            #print 'activations:',activations
         # backward pass
         delta = self.cost_derivative(activations[-1], y) * \
             sigmoid_prime(zs[-1])
+            
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # Note that the variable l in the loop below is used a little
@@ -109,9 +114,10 @@ class Network(object):
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        test_results = [(np.argmax(self.feedforward(x)), y)
+        #test_results = [(np.argmax(self.feedforward(x)), y)
+        test_results = [ abs(self.feedforward(x)- y)
                         for (x, y) in test_data]
-        return sum(int(x == y) for (x, y) in test_results)
+        return sum(int(abs(dy)<0.01) for dy in test_results)
 
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
@@ -132,7 +138,11 @@ def load_data():
         reader = csv.reader(csvfile, delimiter=';')
         data = []
         for row in reader: 
-            data.append((random.random(), tuple(row)))
+            data.append((random.random(), (np.array([float(row[0]),
+                                                    float(row[1]),
+                                                    float(row[2])]).reshape(-1,1),
+                                            np.array([[float(row[3])]])
+                                            ) ))
     csvfile.close()
     data = [ t for (_,t) in sorted(data)]
     N = len(data)/6
