@@ -1,4 +1,4 @@
-import random
+import random,csv
 
 # Third-party libraries
 import numpy as np
@@ -126,3 +126,14 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
+
+def load_data():
+    with open('dataset.csv') as csvfile:
+        reader = csv.reader(csvfile, delimiter=';')
+        data = []
+        for row in reader: 
+            data.append((random.random(), tuple(row)))
+    csvfile.close()
+    data = [ t for (_,t) in sorted(data)]
+    N = len(data)/6
+    return data[:4*N], data[4*N:5:N], data[5*N:]
