@@ -18,7 +18,8 @@ get_dataset([Ae|Targets],N,File) ->
 	{ok,Out} = file:open(File, [append]),
 	Q = train(Ae,N),
 	lists:foreach(
-		fun({A,A_der}=State)->
+		fun(State)->
+			{A,A_der,_} = learn:get_pos(State),
 			Ac = learn:get_best_learned_action(State,Q),
 			Psi = learn:get_psi(Ac),
 			io:format(Out,"~p;~p;~p;~p~n",[Ae,A,A_der,Psi])
@@ -50,11 +51,18 @@ run_episode(Ae,Pos,Tau,T,Q,Eps) when T>0 ->
 	Action = learn:get_policy(State,Q,Eps),
 	Psi = learn:get_psi(Action),
 	NextPos = phy1:next_position(Pos,Psi,Tau),
-	NextState = learn:get_state(NextPos),
-	Rwd = learn:get_reward(Ae,PrevAction,Pos,Action,NextPos),
-	Q1 = learn:learn(State, NextState, Action, Rwd, Q),
-	run_episode(Ae,NextPos,Tau,T-Tau,Q1,Eps);
-	
+	case phy1:is_pos_out(NextPos) of
+		true -> 
+			Rwd = -100, 
+			learn:learn(State, out_state, Action, Rwd, Q);
+
+		false->
+			NextState = learn:get_state(NextPos),
+			Rwd = learn:get_reward(Ae,PrevAction,Pos,Action,NextPos),
+			Q1 = learn:learn(State, NextState, Action, Rwd, Q),
+			run_episode(Ae,NextPos,Tau,T-Tau,Q1,Eps)
+	end;
+		
 run_episode(_Ae,_,_,_T,Q,_) -> Q.
 
 

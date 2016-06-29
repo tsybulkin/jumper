@@ -10,7 +10,7 @@
 		%is_terminal_state/1,
 		get_reward/5,get_best_learned_action/2,
 		learn/5,
-		get_psi/1
+		get_psi/1, get_pos/1
 		]).
 
 -define(ALPHA, 0.5).
@@ -20,6 +20,8 @@
 
 get_state({A,A_der,_Psi}) -> {round(10*A), round(5*A_der)}. 
 
+get_pos({A,A_der}) -> {A/10,A_der/5,undef}.
+
 
 get_reward(Ae,PrevAction,{_A1,_Ad1,_},Action,{A2,_Ad2,_}) ->
 	if
@@ -27,7 +29,6 @@ get_reward(Ae,PrevAction,{_A1,_Ad1,_},Action,{A2,_Ad2,_}) ->
 		A2 > 30  -> -50;
 		true -> -1 + 1/(abs(Ae-A2)+0.1) - abs(PrevAction-Action)*0
 	end.
-
 
 
 learn(State, NextState, Action, Reward, Q) -> 
@@ -50,6 +51,7 @@ learn(State, NextState, Action, Reward, Q) ->
 
 
 
+get_state_value(out_state,_Q) -> 0;
 get_state_value(State,Q) ->
 	case dict:find(State,Q) of
 		{ok, Values} -> {V,_} = lists:max(Values), V;

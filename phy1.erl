@@ -7,7 +7,7 @@
 
 -module(phy1).
 -export([init/0, init/1, get_XYm/3, get_servo/4,
-		next_position/3
+		next_position/3, is_pos_out/1
 		]).
 
 -define(L,  0.1). % leg's length
@@ -29,6 +29,10 @@
 init() -> init(1.5).
 
 init(Alpha) -> {Alpha, 0.0, 0.0}.
+
+is_pos_out({A,_,_}) when A < 0.01 -> true;
+is_pos_out({A,_,_}) when A > 3.1 -> true;
+is_pos_out({_,_,_}) -> false.
 
 
 next_position(Pos,_,Period) when Period =< 0 -> Pos;
