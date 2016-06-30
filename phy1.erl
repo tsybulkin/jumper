@@ -12,7 +12,7 @@
 
 -define(L,  0.1). % leg's length
 -define(M, 0.10). % the mass of the body
--define(K0, 0.02). % friction in the shoulder
+-define(K0, 0.00). % friction in the shoulder
 
 %% springs params
 -define(Z0, 0.03).

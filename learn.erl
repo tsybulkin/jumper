@@ -75,9 +75,9 @@ get_policy(State,Q,Eps) ->
 	end.
 
 
-get_random_action() -> random:uniform(17)-7. 
+get_random_action() -> random:uniform(20)-7. 
 
-get_random_action(Ls) when length(Ls) >= 12 -> get_random_action();
+get_random_action(Ls) when length(Ls) >= 15 -> get_random_action();
 get_random_action(Ls) ->
 	A = get_random_action(),
 	case lists:member(A,Ls) of
@@ -86,7 +86,7 @@ get_random_action(Ls) ->
 	end.
 
 
-get_psi(Action) -> Action/10.
+get_psi(Action) -> Action/20.
 
 
 flip_coin(P) -> random:uniform() < P.

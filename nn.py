@@ -25,7 +25,8 @@ class Network(object):
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
+            #a = sigmoid(np.dot(w, a)+b)
+            a = tanh(np.dot(w, a)+b)
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
@@ -86,12 +87,15 @@ class Network(object):
             #print 'w:',w
             z = np.dot(w, activation)+b
             zs.append(z)
-            activation = sigmoid(z)
+            #activation = sigmoid(z)
+            activation = tanh(z)
             activations.append(activation)
             #print 'activations:',activations
         # backward pass
         delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
+            tanh_prime(zs[-1])
+            #sigmoid_prime(zs[-1])
+            
             
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
@@ -103,7 +107,8 @@ class Network(object):
         # that Python can use negative indices in lists.
         for l in xrange(2, self.num_layers):
             z = zs[-l]
-            sp = sigmoid_prime(z)
+            #sp = sigmoid_prime(z)
+            sp = tanh_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
@@ -117,7 +122,7 @@ class Network(object):
         #test_results = [(np.argmax(self.feedforward(x)), y)
         test_results = [ abs(self.feedforward(x)- y)
                         for (x, y) in test_data]
-        return sum(int(abs(dy)<0.01) for dy in test_results)
+        return sum(int(abs(dy)<0.1) for dy in test_results)
 
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
@@ -133,14 +138,23 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
+
+def tanh(z): 
+    e_minus, e_plus = np.exp(-z), np.exp(z)
+    return (e_plus - e_minus)/(e_plus + e_minus)
+
+def tanh_prime(z):
+    return (2/(np.exp(z)+np.exp(-z)))**2
+
+
 def load_data():
     with open('dataset.csv') as csvfile:
         reader = csv.reader(csvfile, delimiter=';')
         data = []
         for row in reader: 
             data.append((random.random(), (np.array([float(row[0]),
-                                                    float(row[1]),
-                                                    float(row[2])]).reshape(-1,1),
+                                                    float(row[1])-1.51,
+                                                    float(row[2])/100]).reshape(-1,1),
                                             np.array([[float(row[3])]])
                                             ) ))
     csvfile.close()
