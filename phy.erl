@@ -8,7 +8,7 @@
 -module(phy).
 -export([init/0, init/2,
 		next_position/3,
-		get_XYa/3, get_XYh/3, get_XY0/4, get_XY1/3
+		get_XYa/3, get_XYh/3, get_XY0/4, get_XY1/3, get_XY2/4
 		]).
 
 -define(L,  0.1). % leg's length
@@ -30,12 +30,12 @@
 
 -define(I1, 1.00e-3). % Inertial moment of the body arounf CoM
 -define(I2, 1.25e-4). % Inertial moment of the leg around tip of foot
--define(K0, 0.03). % The coefficient of friction between the body and the leg
+-define(K0, 0.02). % The coefficient of friction between the body and the leg
 -define(D, 0.03). % The distance between body CoM and hip
 -define(G, 9.81).
 
 
-init() -> init(1.6, 0.35).
+init() -> init(2.1, 0.20).
 
 init(Alpha, Beta) -> {Alpha, 0.0, Beta, 0.0, 0.0}.
 
@@ -99,5 +99,8 @@ get_XYh(Xt,Yt,B) -> {Xt+?Rh*math:cos(?Eta+B), Yt+?Rh*math:sin(?Eta+B)}.
 
 get_XY0(Xt,Yt,A,B)->{Xt+?Rh*math:cos(?Eta+B)-?D*math:sin(A+B), 
 					 Yt+?Rh*math:sin(?Eta+B)+?D*math:cos(A+B)}.
+
+get_XY2(Xt,Yt,A,B)->{Xt+?Rh*math:cos(?Eta+B)-2*?D*math:sin(A+B), 
+					 Yt+?Rh*math:sin(?Eta+B)+2*?D*math:cos(A+B)}.
 
 get_XY1(Xt,Yt,B) -> {Xt+?R0*math:cos(?Eta0+B), Yt+?R0*math:sin(?Eta0+B)}.

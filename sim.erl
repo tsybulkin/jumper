@@ -14,7 +14,7 @@ run(Tau,T) ->
 	io:format("Time   A  A_der  B  B_der  Psi~n"),
 	run(phy:init(),Tau,T,[]).
 
-run(_,_,T,Log) when T<0 -> show:make_demo(lists:reverse(Log));
+run(_,Tau,T,Log) when T<0 -> show:make_demo(lists:reverse(Log),10*Tau);
 run(Pos,Tau,T,Log) -> 
 	Pos1 = phy:next_position(Pos,0,Tau),
 	io:format("~p~n",[Pos1]),
