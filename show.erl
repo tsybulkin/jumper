@@ -60,6 +60,6 @@ draw_body([],_,_,Out) ->
 
 
 
-px({X,Y}) -> {100+round(X*4000), 600-round(Y*4000)}.
+px({X,Y}) -> {300+round(X*2000), 400-round(Y*2000)}.
 
 degr(Rad) -> round(180*Rad/?PI).

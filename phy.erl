@@ -30,12 +30,12 @@
 
 -define(I1, 1.00e-3). % Inertial moment of the body arounf CoM
 -define(I2, 1.25e-4). % Inertial moment of the leg around tip of foot
--define(K0, 0.02). % The coefficient of friction between the body and the leg
+-define(K0, 0.03). % The coefficient of friction between the body and the leg
 -define(D, 0.03). % The distance between body CoM and hip
 -define(G, 9.81).
 
 
-init() -> init(2.1, 0.20).
+init() -> init(2.2, 0.15).
 
 init(Alpha, Beta) -> {Alpha, 0.0, Beta, 0.0, 0.0}.
 
