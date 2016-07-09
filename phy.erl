@@ -53,15 +53,6 @@ next_position({A,A_der,B,B_der,Psi},New_Psi,Tau) ->
 		+ (A + A_der*Tau)*i21(A)
 		+ (B + B_der*Tau)*i23(A),
 
-	%io:format("I1=~p~n",[?I1]),
-	%io:format("I11=~p~n",[E12]),
-	%io:format("I21=~p~n",[E21]),
-	%io:format("I12=~p~n",[i12(A)]),
-	%io:format("I22=~p~n",[E22]),
-	%io:format("I23=~p~n",[i23(A)]),
-	%io:format("I24=~p~n",[i24(A)]),
-	%io:format("f1=~p~n",[f1(A,B,Psi)]),
-	%io:format("f2=~p~n",[f2(A,B)]),
 	
 	Det = E11*E22 - E12*E21,
 	A1 = (C1*E22 - C2*E12)/Det,

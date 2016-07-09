@@ -1,30 +1,6 @@
 from sympy import cos, sin, diff, symbols
 from sympy.physics.mechanics import LagrangesMethod, dynamicsymbols
-#from mpmath import *
 
-"""
-g = 9.81
-m1 = 0.20
-m2 = 0.05
-L1 = 0.05
-L2 = 0.15
-L3 = 0.10
-I1 = 0.1e-3
-I2 = 0.1e-4
-gama = 0.1
-eps = 0.5
-x,y = 10,0
-z0 = 0.02
-z1 = 0.03
-z2 = 0.03
-z3 = 0.03
-k1 = 200
-k2 = 200
-k3 = 200
-dz = 0.05
-da = 0.02
-psi = 0
-"""
 
 def init_vars(): return dynamicsymbols('a b gama')
 
