@@ -18,7 +18,7 @@ def L(a,b,gama):
 
 	u1 = dz + z0*sin(psi) - z1*cos(a)
 	u2 = dz - z0*sin(psi) + z2*cos(a)
-	u3 = da + z3*cos(gama)
+	u3 = da - z3*cos(gama)
 
 
 	T = m1/2*(x1.diff('t')**2 + y1.diff('t')**2) + I1/2*(a_d**2 + b_d**2 + gama_d**2) + \
