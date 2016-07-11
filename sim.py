@@ -1,6 +1,7 @@
 from params import *
 import numpy as np
 import a_s, b_s, g_s
+import x_f, y_f, a_f, b_f
 from show import show
 
 
@@ -41,12 +42,16 @@ class Robot():
 
 
 	def next_standing_pos(self,tau):
-		C = np.array([a_s.get_c1(self.q,self.q_d,self.psi),
-					b_s.get_c2(self.q,self.q_d,self.psi),
-					g_s.get_c3(self.q,self.q_d,self.psi)])
-		D = - np.array([a_s.get_d1(self.q, self.q_d,self.psi),
-						b_s.get_d2(self.q,self.q_d,self.psi),
-						g_s.get_d3(self.q,self.q_d,self.psi) ])
+		C = np.array([
+			a_s.get_c1(self.q,self.q_d,self.psi),
+			b_s.get_c2(self.q,self.q_d,self.psi),
+			g_s.get_c3(self.q,self.q_d,self.psi)
+			])
+		D = - np.array([
+			a_s.get_d1(self.q, self.q_d,self.psi),
+			b_s.get_d2(self.q,self.q_d,self.psi),
+			g_s.get_d3(self.q,self.q_d,self.psi) 
+			])
 		
 		self.q_d += np.hstack([np.zeros(2),tau * np.linalg.inv(C).dot(D)])
 		self.q += tau * self.q_d
@@ -68,9 +73,22 @@ class Robot():
 			
 
 	def next_flying_pos(self,tau):
-		self.q_d = np.array([0, 10*(0.1-self.q[1]), 0, 0, 0])
-		self.q += tau* self.q_d
+		C = np.array([
+			x_f.get_c1(self.q,self.q_d,self.psi),
+			y_f.get_c2(self.q,self.q_d,self.psi),
+			a_f.get_c3(self.q,self.q_d,self.psi),
+			b_f.get_c4(self.q,self.q_d,self.psi)
+			])
+		D = - np.array([
+			x_f.get_d1(self.q, self.q_d,self.psi),
+			y_f.get_d2(self.q,self.q_d,self.psi),
+			a_f.get_d3(self.q,self.q_d,self.psi),
+			b_f.get_d4(self.q,self.q_d,self.psi)
+			])
 		
+		self.q_d += np.hstack([tau * np.linalg.inv(C).dot(D),np.zeros(1)])
+		self.q += tau * self.q_d
+
 		
 
 	def fell(self):

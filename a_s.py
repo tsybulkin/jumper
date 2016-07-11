@@ -7,7 +7,7 @@ def get_c1(q, q_d, psi=0):
 	_,_,a,b,g = q
 	_,_,a_d,b_d,g_d = q_d
 
-	return np.array([ 
+	return np.array([
 
 		I1 + 2*L1**2*m1*sin(a + b + g)**2,
 
