@@ -8,12 +8,12 @@ def show(anim_file, state_log,tau):
 	f = open(anim_file,'w')
 	f.write("<html>\n<body>\n<svg width='1000' height='650'>\n")
 
-	draw_line(f,[((x,y),(x+L3*cos(b),y+L3*sin(b))) for (_,b,_) in state_log ],3,'blue',tau)
-	draw_line(f,[((x+L3*cos(b),y+L3*sin(b)),(x+L3*cos(b)+L2*cos(b+gama),y+L3*sin(b)+L2*sin(b+gama))) 
-		for (_,b,gama) in state_log ],5,'rgb(50,50,200)',tau)
-	draw_line(f,[((x+L3*cos(b)+L2*cos(b+gama),y+L3*sin(b)+L2*sin(b+gama)),
-			(x+L3*cos(b)+L2*cos(b+gama)+2*L1*cos(a+b+gama),y+L3*sin(b)+L2*sin(b+gama)+2*L1*sin(a+b+gama))) 
-		for (a,b,gama) in state_log ],7,'rgb(70,70,150)',tau)
+	draw_line(f,[((x,y),(x+L3*cos(b),y+L3*sin(b))) for (x,y,_,b,_) in state_log ],5,'blue',tau)
+	draw_line(f,[((x+L3*cos(b),y+L3*sin(b)),(x+L3*cos(b)+L2*cos(b+g),y+L3*sin(b)+L2*sin(b+g))) 
+		for (x,y,_,b,g) in state_log ],7,'rgb(50,50,200)',tau)
+	draw_line(f,[((x+L3*cos(b)+L2*cos(b+g),y+L3*sin(b)+L2*sin(b+g)),
+			(x+L3*cos(b)+L2*cos(b+g)+2*L1*cos(a+b+g),y+L3*sin(b)+L2*sin(b+g)+2*L1*sin(a+b+g))) 
+		for (x,y,a,b,g) in state_log ],9,'rgb(70,70,150)',tau)
 
 	f.write("</svg>\n</body>\n</html>")
 	f.close()
