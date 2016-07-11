@@ -1,6 +1,8 @@
 from params import *
 from numpy import sin, cos
 
+x,y = 0.3, 0 # coords of the toe tip
+
 
 def show(anim_file, state_log,tau):
 	f = open(anim_file,'w')
