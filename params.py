@@ -2,7 +2,7 @@
 #
 
 Grav = 9.81
-m1 = 0.20
+m1 = 0.30
 m2 = 0.05
 L1 = 0.06
 L2 = 0.15
@@ -17,11 +17,11 @@ z0 = 0.02 # leverage of the leg's servo
 z1 = 0.02 
 z2 = 0.02
 z3 = 0.02 
-k1 = 200 # spring's coeffs
-k2 = 200
-k3 = 100
+k1 = 400 # spring's coeffs
+k2 = 400
+k3 = 600
 dz = 0.05 # initial stretch of the springs
-da = 0.07
+da = 0.07+0.03
 
-miu1 = 0.02
-miu2 = 0.02
+miu_a = 0.002
+miu_g = 0.002

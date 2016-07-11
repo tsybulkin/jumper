@@ -26,10 +26,10 @@ def run(tau,T,playback_speedup=1):
 
 
 class Robot():
-	def __init__(self,x=0.4, y=0., a=2.4, b=1.08, g=1.1):
+	def __init__(self,x=0.4, y=0., a=2.4, b=1.08, g=1.2):
 		self.q = np.array([x,y,a,b,g])
 		self.q_d = np.zeros(5)
-		self.psi = 0.
+		self.psi = 0.5
 		self.state_log = []
 
 	def next_pos(self,tau):

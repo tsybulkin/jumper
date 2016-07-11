@@ -44,7 +44,7 @@ def get_d1(q, q_d, psi=0):
 		+ dz*k1*z1*sin(a) - dz*k2*z2*sin(a) \
 		+ k1*z0*z1*sin(psi)*sin(a) - k1*z1**2*sin(2*a)/2 \
 		+ k2*z0*z2*sin(psi)*sin(a) - k2*z2**2*sin(2*a)/2 \
-		+ miu1*a_d
+		+ miu_a*a_d
 
 
 

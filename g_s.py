@@ -68,5 +68,5 @@ def get_d3(q,q_d,psi=0):
 		+ L2*eps*Grav*m2*cos(b + g) \
 		+ L2*Grav*m1*cos(b + g) \
 		+ da*k3*z3*sin(g) + k3*z3**2*sin(2*g)/2 \
-		+ miu2*g_d
+		+ miu_g*g_d
 
