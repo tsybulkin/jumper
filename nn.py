@@ -25,8 +25,8 @@ class Network(object):
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
-            #a = sigmoid(np.dot(w, a)+b)
-            a = tanh(np.dot(w, a)+b)
+            a = sigmoid(np.dot(w, a)+b)
+            #a = tanh(np.dot(w, a)+b)
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
@@ -87,14 +87,15 @@ class Network(object):
             #print 'w:',w
             z = np.dot(w, activation)+b
             zs.append(z)
-            #activation = sigmoid(z)
-            activation = tanh(z)
+            activation = sigmoid(z)
+            #activation = tanh(z)
             activations.append(activation)
             #print 'activations:',activations
         # backward pass
         delta = self.cost_derivative(activations[-1], y) * \
-            tanh_prime(zs[-1])
-            #sigmoid_prime(zs[-1])
+            sigmoid_prime(zs[-1])
+            #tanh_prime(zs[-1])
+            
             
             
         nabla_b[-1] = delta
@@ -107,8 +108,8 @@ class Network(object):
         # that Python can use negative indices in lists.
         for l in xrange(2, self.num_layers):
             z = zs[-l]
-            #sp = sigmoid_prime(z)
-            sp = tanh_prime(z)
+            sp = sigmoid_prime(z)
+            #sp = tanh_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
@@ -120,9 +121,10 @@ class Network(object):
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
         #test_results = [(np.argmax(self.feedforward(x)), y)
-        test_results = [ abs(self.feedforward(x)- y)
-                        for (x, y) in test_data]
-        return sum(int(abs(dy)<0.1) for dy in test_results)
+        test_results = sum( abs(self.feedforward(x)- y)
+                        for (x, y) in test_data )
+        #return sum(int(abs(dy)<0.1) for dy in test_results)
+        return test_results/len(test_data)
 
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
@@ -152,10 +154,10 @@ def load_data():
         reader = csv.reader(csvfile, delimiter=';')
         data = []
         for row in reader: 
-            data.append((random.random(), (np.array([float(row[0]),
-                                                    float(row[1])-1.51,
-                                                    float(row[2])/100]).reshape(-1,1),
-                                            np.array([[float(row[3])]])
+            data.append((random.random(), (np.array([(float(row[0])-1.51)/2,
+                                                    (float(row[1])-1.51)/2,
+                                                    float(row[2])/20]).reshape(-1,1),
+                                            np.array([[(float(row[3])+1.0)/2]])
                                             ) ))
     csvfile.close()
     data = [ t for (_,t) in sorted(data)]

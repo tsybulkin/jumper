@@ -2,7 +2,7 @@
 #
 
 Grav = 9.81
-m1 = 0.30
+m1 = 0.20
 m2 = 0.05
 L1 = 0.06
 L2 = 0.15
@@ -23,5 +23,5 @@ k3 = 600
 dz = 0.05 # initial stretch of the springs
 da = 0.07+0.03
 
-miu_a = 0.002
-miu_g = 0.002
+miu_a = 0.005
+miu_g = 0.005

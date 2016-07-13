@@ -27,17 +27,22 @@ def run(tau,T,playback_speedup=1):
 
 
 class Robot():
-	def __init__(self,x=0.4, y=0., a=2.4, b=1.08, g=1.2):
+	def __init__(self,x=0.4, y=0., a=2.4, b=1., g=1.2):
 		self.q = np.array([x,y,a,b,g])
 		self.q_d = np.zeros(5)
-		self.psi = 0.5
+		self.psi = 0.4
 		self.state_log = []
 
 	def next_pos(self,tau):
-		if self.q[4] == g0: # flies
-			self.next_flying_pos(tau)
+		if self.q[1] > 0: # flies
+			self.q_d = self.next_flying_pos(tau)
 		else: # stands
-			self.next_standing_pos(tau)	
+			q_d_s = self.next_standing_pos(tau)	
+			q_d_f = self.next_flying_pos(tau)
+			if q_d_f[1] > q_d_s[1]: self.q_d = q_d_f
+			else: self.q_d = q_d_s
+
+		self.q += tau * self.q_d
 		self.state_log.append(tuple(self.q))
 
 
@@ -53,27 +58,12 @@ class Robot():
 			g_s.get_d3(self.q,self.q_d,self.psi) 
 			])
 		
-		self.q_d += np.hstack([np.zeros(2),tau * np.linalg.inv(C).dot(D)])
-		self.q += tau * self.q_d
-
-		if self.q[4] < g0:
-			bn = self.q[4]
-			xa = self.q[0] + L3*np.cos(bn)
-			ya = self.q[1] + L3*np.sin(bn)
-			delta = g0 - self.q[4]
-			self.q_d[4] = 0
-			self.q[0] = xa - L3*np.cos(bn-delta)
-			self.q[1] = ya - L3*np.sin(bn-delta)  
-
-			if self.q[3] > np.pi/2:
-				self.q[1] = 0
-
-			self.q[3] += -delta 
-			self.q[4] = g0
-			
+		return self.q_d + np.hstack([np.zeros(2),tau * np.linalg.inv(C).dot(D)])
+		
+	
 
 	def next_flying_pos(self,tau):
-		C = np.array([
+		C = np.vstack([
 			x_f.get_c1(self.q,self.q_d,self.psi),
 			y_f.get_c2(self.q,self.q_d,self.psi),
 			a_f.get_c3(self.q,self.q_d,self.psi),
@@ -85,10 +75,7 @@ class Robot():
 			a_f.get_d3(self.q,self.q_d,self.psi),
 			b_f.get_d4(self.q,self.q_d,self.psi)
 			])
-		
-		self.q_d += np.hstack([tau * np.linalg.inv(C).dot(D),np.zeros(1)])
-		self.q += tau * self.q_d
-
+		return self.q_d + np.hstack([tau * np.linalg.inv(C).dot(D), np.zeros(1)])
 		
 
 	def fell(self):
